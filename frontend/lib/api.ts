@@ -1,6 +1,9 @@
 // API client for communicating with FastAPI backend
 
-const API_BASE_URL = 'https://pharma-ai-backend.onrender.com';
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://pharma-ai-backend.onrender.com'
+    : 'http://localhost:8000';
+
 // Type definitions matching backend models
 export interface QueryRequest {
     query: string;
@@ -83,4 +86,3 @@ class PharmaAIClient {
 
 // Export singleton instance
 export const apiClient = new PharmaAIClient();
-
