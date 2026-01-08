@@ -25,20 +25,27 @@ app = FastAPI(
 # ============================================
 # CORS CONFIGURATION
 # ============================================
-
+# CORS - Allow ALL origins (for testing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://pharma-ai-platform-ox5p-lhmkcb8p8-yunusa-jibrins-projects.vercel.app",
-        "https://pharma-ai-platform.vercel.app",
-        "https://pharma-sales-ai.vercel.app",
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app$",
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow ALL origins temporarily
+    allow_credentials=False,  # Must be False when using "*"
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "http://localhost:3000",
+#         "https://pharma-ai-platform-ox5p-lhmkcb8p8-yunusa-jibrins-projects.vercel.app",
+#         "https://pharma-ai-platform.vercel.app",
+#         "https://pharma-sales-ai.vercel.app",
+#     ],
+#     allow_origin_regex=r"https://.*\.vercel\.app$",
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # ============================================
 # AGENT ORCHESTRATOR
