@@ -1,7 +1,6 @@
 // API client for communicating with FastAPI backend
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
+const API_BASE_URL = 'https://pharma-ai-backend.onrender.com';
 // Type definitions matching backend models
 export interface QueryRequest {
     query: string;
