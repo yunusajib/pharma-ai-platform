@@ -6,11 +6,15 @@ import os
 from dotenv import load_dotenv
 import time
 
-# Import our agent system
+# Import agent system
 from agents.orchestrator import AgentOrchestrator
 
 # Load environment variables
 load_dotenv()
+
+# ============================================
+# APP INITIALIZATION
+# ============================================
 
 app = FastAPI(
     title="Pharma AI Backend",
@@ -18,20 +22,32 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware
+# ============================================
+# CORS CONFIGURATION
+# ============================================
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://pharma-ai-platform-ox5p-lhmkcb8p8-yunusa-jibrins-projects.vercel.app",
+        "https://pharma-ai-platform.vercel.app",
+        "https://pharma-sales-ai.vercel.app",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize agent orchestrator
+# ============================================
+# AGENT ORCHESTRATOR
+# ============================================
+
 orchestrator = AgentOrchestrator()
 
 # ============================================
-# REQUEST/RESPONSE MODELS
+# REQUEST / RESPONSE MODELS
 # ============================================
 
 
@@ -57,10 +73,10 @@ class QueryResponse(BaseModel):
     compliance_status: ComplianceCheck
     response_time_seconds: float
 
+
 # ============================================
 # API ENDPOINTS
 # ============================================
-
 
 @app.get("/")
 def read_root():
@@ -69,7 +85,13 @@ def read_root():
         "message": "Pharma AI Backend - Multi-Agent System",
         "status": "operational",
         "version": "1.0.0",
-        "agents": ["sales", "medical", "compliance", "hcp_persona", "audit"],
+        "agents": [
+            "sales",
+            "medical",
+            "compliance",
+            "hcp_persona",
+            "audit"
+        ],
         "ai_enabled": True,
         "endpoints": {
             "health": "/health",
@@ -83,7 +105,6 @@ def read_root():
 @app.get("/health")
 def health_check():
     """Health check endpoint"""
-    # Check if OpenAI key is configured
     openai_configured = bool(os.getenv("OPENAI_API_KEY"))
 
     return {
@@ -97,18 +118,16 @@ def health_check():
 @app.post("/api/query", response_model=QueryResponse)
 async def process_query(request: QueryRequest):
     """
-    Main query endpoint - processes user questions through AI agents.
-    Now with REAL AI integration!
+    Main query endpoint – processes user questions
+    through the multi-agent AI system.
     """
     try:
-        # Process through agent orchestrator
         result = await orchestrator.process_query(
             query=request.query,
             user_id=request.user_id,
             hcp_context=request.hcp_context
         )
 
-        # Format response
         return QueryResponse(
             query=request.query,
             response=result["response"],
@@ -118,9 +137,7 @@ async def process_query(request: QueryRequest):
         )
 
     except Exception as e:
-        # Log error (in production, use proper logging)
-        print(f"Error processing query: {str(e)}")
-
+        print(f"❌ Error processing query: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing query: {str(e)}"
@@ -135,32 +152,51 @@ def get_agent_status():
     return {
         "total_agents": 5,
         "agents": [
-            {"name": "sales_agent",
-                "status": "active" if openai_configured else "offline", "version": "1.0.0"},
-            {"name": "medical_agent", "status": "planned", "version": "1.0.0"},
-            {"name": "compliance_guardian", "status": "active", "version": "1.0.0"},
-            {"name": "hcp_persona_agent", "status": "planned", "version": "1.0.0"},
-            {"name": "audit_agent", "status": "active", "version": "1.0.0"}
+            {
+                "name": "sales_agent",
+                "status": "active" if openai_configured else "offline",
+                "version": "1.0.0"
+            },
+            {
+                "name": "medical_agent",
+                "status": "planned",
+                "version": "1.0.0"
+            },
+            {
+                "name": "compliance_guardian",
+                "status": "active",
+                "version": "1.0.0"
+            },
+            {
+                "name": "hcp_persona_agent",
+                "status": "planned",
+                "version": "1.0.0"
+            },
+            {
+                "name": "audit_agent",
+                "status": "active",
+                "version": "1.0.0"
+            }
         ],
-        "system_status": "operational" if openai_configured else "configuration_required",
+        "system_status": (
+            "operational" if openai_configured else "configuration_required"
+        ),
         "openai_configured": openai_configured
     }
 
-# ============================================
-# STARTUP/SHUTDOWN EVENTS
-# ============================================
 
+# ============================================
+# STARTUP / SHUTDOWN EVENTS
+# ============================================
 
 @app.on_event("startup")
 async def startup_event():
-    """Run on application startup"""
     print("🚀 Pharma AI Backend starting up...")
 
-    # Check OpenAI configuration
     if os.getenv("OPENAI_API_KEY"):
         print("✅ OpenAI API key configured")
     else:
-        print("⚠️  WARNING: OPENAI_API_KEY not set! Add it to .env file")
+        print("⚠️  WARNING: OPENAI_API_KEY not set!")
 
     print("📊 Agents initialized")
     print("✅ Server ready!")
@@ -168,8 +204,8 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Run on application shutdown"""
     print("👋 Pharma AI Backend shutting down...")
+
 
 # ============================================
 # RUN SERVER
@@ -178,16 +214,16 @@ async def shutdown_event():
 if __name__ == "__main__":
     import uvicorn
 
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("🏥 PHARMA AI - MULTI-AGENT SYSTEM")
-    print("="*50)
-    print("\n📍 Starting server on http://localhost:8000")
-    print("📖 API Docs: http://localhost:8000/docs")
-    print("❤️  Health Check: http://localhost:8000/health")
+    print("=" * 50)
+    print("\n📍 Server: http://localhost:8000")
+    print("📖 Docs:   http://localhost:8000/docs")
+    print("❤️  Health: http://localhost:8000/health")
     print("\n⌨️  Press CTRL+C to stop\n")
 
     uvicorn.run(
-        app,
+        "main:app",
         host="0.0.0.0",
         port=8000,
         reload=True,
