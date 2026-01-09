@@ -1,9 +1,7 @@
-// API client for communicating with FastAPI backend
+// API client - now calls same-domain Vercel functions (NO CORS!)
 
-// HARDCODED for production - environment vars not working
-const API_BASE_URL = 'https://pharma-ai-backend.onrender.com';
+const API_BASE_URL = ''; // Empty = same domain
 
-// Type definitions matching backend models
 export interface QueryRequest {
   query: string;
   user_id: string;
@@ -27,19 +25,6 @@ export interface QueryResponse {
   response_time_seconds: number;
 }
 
-export interface AgentStatus {
-  name: string;
-  status: string;
-  version: string;
-}
-
-export interface AgentsResponse {
-  total_agents: number;
-  agents: AgentStatus[];
-  system_status: string;
-}
-
-// API Client Class
 class PharmaAIClient {
   private baseUrl: string;
 
@@ -47,25 +32,14 @@ class PharmaAIClient {
     this.baseUrl = baseUrl;
   }
 
-  // Health check
   async healthCheck(): Promise<{ status: string; version: string }> {
-    const response = await fetch(`${this.baseUrl}/health`);
+    const response = await fetch(`${this.baseUrl}/api/health`);
     if (!response.ok) {
       throw new Error('Health check failed');
     }
     return response.json();
   }
 
-  // Get agent status
-  async getAgentStatus(): Promise<AgentsResponse> {
-    const response = await fetch(`${this.baseUrl}/api/agents/status`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch agent status');
-    }
-    return response.json();
-  }
-
-  // Send query to backend
   async sendQuery(request: QueryRequest): Promise<QueryResponse> {
     const response = await fetch(`${this.baseUrl}/api/query`, {
       method: 'POST',
@@ -83,5 +57,4 @@ class PharmaAIClient {
   }
 }
 
-// Export singleton instance
 export const apiClient = new PharmaAIClient();
