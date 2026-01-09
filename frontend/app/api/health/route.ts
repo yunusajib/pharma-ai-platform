@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const response = await fetch('https://pharma-ai-backend.onrender.com/health');
+    // NEW RENDER URL!
+    const response = await fetch('https://pharma-ai-backend-1dlq.onrender.com/health');
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
