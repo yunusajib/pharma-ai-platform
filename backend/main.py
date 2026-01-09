@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List
 import os
@@ -37,39 +36,45 @@ class QueryResponse(BaseModel):
 @app.get("/")
 def read_root():
     return {
-        "message": "Pharma AI Backend",
+        "message": "Pharma AI Backend - Multi-Agent System",
         "status": "operational",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "endpoints": ["/health", "/api/query", "/api/agents/status", "/docs"]
     }
 
 @app.get("/health")
 def health_check():
+    openai_configured = bool(os.getenv("OPENAI_API_KEY"))
     return {
         "status": "healthy",
         "version": "1.0.0",
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
+        "openai_configured": openai_configured,
         "timestamp": time.time()
     }
 
-@app.post("/api/query")
+@app.post("/api/query", response_model=QueryResponse)
 async def process_query(request: QueryRequest):
     try:
+        print(f"[API] Received query: {request.query}")
+        
         result = await orchestrator.process_query(
             query=request.query,
             user_id=request.user_id,
             hcp_context=request.hcp_context
         )
         
-        return {
-            "query": request.query,
-            "response": result["response"],
-            "agents_used": result["agents_used"],
-            "compliance_status": result["compliance_status"],
-            "response_time_seconds": result["response_time_seconds"]
-        }
+        print(f"[API] Query processed successfully")
+        
+        return QueryResponse(
+            query=request.query,
+            response=result["response"],
+            agents_used=result["agents_used"],
+            compliance_status=ComplianceCheck(**result["compliance_status"]),
+            response_time_seconds=result["response_time_seconds"]
+        )
         
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"[API] Error processing query: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/agents/status")
@@ -79,17 +84,27 @@ def get_agent_status():
         "total_agents": 5,
         "agents": [
             {"name": "sales_agent", "status": "active" if openai_configured else "offline", "version": "1.0.0"},
+            {"name": "medical_agent", "status": "planned", "version": "1.0.0"},
             {"name": "compliance_guardian", "status": "active", "version": "1.0.0"},
+            {"name": "hcp_persona_agent", "status": "planned", "version": "1.0.0"},
+            {"name": "audit_agent", "status": "active", "version": "1.0.0"}
         ],
-        "system_status": "operational",
+        "system_status": "operational" if openai_configured else "configuration_required",
         "openai_configured": openai_configured
     }
 
 @app.on_event("startup")
 async def startup_event():
-    print("🚀 Backend starting...")
-    print("✅ OpenAI:", "configured" if os.getenv("OPENAI_API_KEY") else "NOT SET")
-    print("✅ Ready!")
+    print("="*50)
+    print("🚀 Pharma AI Backend Starting")
+    print("="*50)
+    if os.getenv("OPENAI_API_KEY"):
+        print("✅ OpenAI API key configured")
+    else:
+        print("⚠️  WARNING: OPENAI_API_KEY not set!")
+    print("📊 Agents initialized")
+    print("✅ Server ready!")
+    print("="*50)
 
 if __name__ == "__main__":
     import uvicorn
