@@ -1,0 +1,33 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Runs every 10 minutes
+    - cron: '*/10 * * * *'
+  
+  # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping Render Backend
+        run: |
+          echo "Pinging backend at $(date)"
+          
+          # Ping health endpoint
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://pharma-ai-backend-1dlq.onrender.com/health)
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ Backend is alive (HTTP $response)"
+          else
+            echo "⚠️  Backend returned HTTP $response (may be waking up)"
+          fi
+          
+          # Always exit 0 so workflow doesn't fail if backend is sleeping
+          exit 0
+      
+      - name: Log Status
+        run: echo "Keep-alive ping completed at $(date)"
