@@ -10,7 +10,7 @@ Real-Time AI Assistant for Pharmaceutical Sales with Compliance Enforcement
 
 ---
 
-> 🎯  [**Try the live demo**](https://pharma-ai-platform-ox5p-[your-url].vercel.app) in 60 seconds.  
+> 🎯  [**Try the live demo**](https://pharma-ai-platform-ox5p-9xauolpb4-yunusa-jibrins-projects.vercel.app/) in 60 seconds.  
 > Ask "How do I handle pricing objections?" and watch real-time AI + compliance enforcement.  
 > Then click the orange "Off-Label Detection Demo" button to see instant compliance blocking.
 
