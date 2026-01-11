@@ -1,160 +1,184 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MessageSquare, FileText, TrendingUp } from "lucide-react";
-import Link from "next/link";
+'use client';
 
-export default function Dashboard() {
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 p-4 md:p-8">
-            {/* Header */}
-            <div className="max-w-6xl mx-auto mb-8">
-                <div className="flex items-center justify-between mb-2">
-                    <h1 className="text-3xl font-bold text-slate-900">Pharma Sales AI</h1>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Demo Mode
-                    </Badge>
-                </div>
-                <p className="text-slate-600">AI-powered compliance-first sales enablement</p>
-            </div>
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-            <div className="max-w-6xl mx-auto">
-                {/* Welcome Section */}
-                <Card className="mb-6 border-blue-200 bg-blue-50">
-                    <CardHeader>
-                        <CardTitle className="text-blue-900">👋 Welcome, Sarah</CardTitle>
-                        <CardDescription className="text-blue-700">
-                            You have 4 calls scheduled today
-                        </CardDescription>
-                    </CardHeader>
-                </Card>
+export default function Home() {
+  const [agentStatus, setAgentStatus] = useState<any>(null);
 
-                {/* Quick Actions */}
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold text-slate-900 mb-4">🎯 Quick Actions</h2>
+  useEffect(() => {
+    // Wake up backend on page load
+    const wakeBackend = async () => {
+      try {
+        console.log('Waking up backend...');
+        await fetch('/api/health', { method: 'GET' });
+      } catch (e) {
+        console.log('Backend wake-up initiated');
+      }
+    };
+    
+    wakeBackend();
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {/* Pre-Call Prep */}
-                        <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-blue-200">
-                            <CardHeader>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <Calendar className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-lg">Prepare for Next Call</CardTitle>
-                                        <CardDescription>Dr. Martinez • 10:30 AM • Cardiology</CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                                    Start Preparation
-                                </Button>
-                            </CardContent>
-                        </Card>
+    // Fetch agent status
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch('/api/agents/status');
+        if (response.ok) {
+          const data = await response.json();
+          setAgentStatus(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch agent status:', error);
+      }
+    };
 
-                        {/* Real-Time Q&A - WITH LINK */}
-                        <Link href="/qa">
-                            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                            <MessageSquare className="w-6 h-6 text-purple-600" />
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-lg">Ask a Question</CardTitle>
-                                            <CardDescription>Get real-time support during calls</CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <Button variant="outline" className="w-full">
-                                        Open Q&A
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Link>
+    fetchStatus();
+  }, []);
 
-                        {/* Documentation */}
-                        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                            <CardHeader>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <FileText className="w-6 h-6 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-lg">Log Last Call</CardTitle>
-                                        <CardDescription>Quick documentation</CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <Button variant="outline" className="w-full">
-                                    Create Notes
-                                </Button>
-                            </CardContent>
-                        </Card>
-
-                        {/* Insights */}
-                        <Card className="hover:shadow-lg transition-shadow">
-                            <CardHeader>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                        <TrendingUp className="w-6 h-6 text-orange-600" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-lg">Today's Insights</CardTitle>
-                                        <CardDescription>Territory performance</CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-600">Call Success Rate</span>
-                                        <span className="font-semibold text-green-600">75%</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-600">vs. Target</span>
-                                        <span className="font-semibold">68% avg</span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* AI Agents Status */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>🤖 AI Agents Available</CardTitle>
-                        <CardDescription>Multi-agent system ready to assist</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid md:grid-cols-3 gap-3">
-                            <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-green-900">Sales Agent</span>
-                            </div>
-                            <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-green-900">Medical Agent</span>
-                            </div>
-                            <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-green-900">Compliance Guardian</span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Footer */}
-                <div className="mt-8 text-center text-sm text-slate-500">
-                    <p>Portfolio Project • Built with Next.js, FastAPI, CrewAI, GPT-4o</p>
-                    <p className="mt-1">Compliance-First AI for Regulated Industries</p>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            💊 Pharma AI Platform
+          </h1>
+          <p className="text-xl text-gray-600 mb-2">
+            Multi-Agent AI System for Pharmaceutical Sales
+          </p>
+          <p className="text-lg text-gray-500">
+            Real-time compliance detection • Strategic sales guidance • Conversation intelligence
+          </p>
         </div>
-    );
+
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+          {/* Q&A Agent Card */}
+          <Link href="/qa">
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-blue-500">
+              <div className="text-4xl mb-4">🤖</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                AI Sales Assistant
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Get real-time strategic advice with automatic compliance checking
+              </p>
+              <div className="text-blue-600 font-semibold">
+                Ask a Question →
+              </div>
+            </div>
+          </Link>
+
+          {/* Conversation Analysis Card */}
+          <Link href="/analysis">
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-indigo-500">
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Conversation Intelligence
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Analyze sales conversations with AI-powered scoring and coaching
+              </p>
+              <div className="text-indigo-600 font-semibold">
+                Analyze Conversations →
+              </div>
+            </div>
+          </Link>
+
+          {/* Agent Status Card */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="text-4xl mb-4">⚙️</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              System Status
+            </h3>
+            {agentStatus ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Sales Agent</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Active
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Compliance</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Active
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Analysis Agent</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Active
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-500">Loading status...</div>
+            )}
+          </div>
+        </div>
+
+        {/* Key Features */}
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            🎯 Key Features
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex items-start">
+              <div className="text-2xl mr-3">✅</div>
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-1">
+                  Real-time Compliance Detection
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  3-layer off-label detection prevents regulatory violations
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="text-2xl mr-3">🧠</div>
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-1">
+                  Multi-Agent AI System
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Orchestrated agents for sales strategy and compliance
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="text-2xl mr-3">⚡</div>
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-1">
+                  Fast Response Times
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  8-12s AI responses, &lt;1s compliance blocking
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="text-2xl mr-3">📈</div>
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-1">
+                  Performance Analytics
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  AI-powered conversation scoring and coaching
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Note */}
+        <div className="text-center mt-12 text-gray-500 text-sm">
+          <p>Powered by OpenAI GPT-4 • FastAPI • Next.js</p>
+          <p className="mt-2">
+            Backend hosted on Render free tier - first request may take 30s to wake up
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
