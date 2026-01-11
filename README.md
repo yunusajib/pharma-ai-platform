@@ -16,6 +16,7 @@ Real-Time AI Assistant for Pharmaceutical Sales with Compliance Enforcement
 
 ---
 
+
 ## 💡 The Problem
 
 Pharmaceutical sales representatives face a critical challenge: they need **instant, accurate answers** to physician questions during sales calls, but must **never discuss off-label drug uses** (FDA violation with fines up to **$500K per incident**).
